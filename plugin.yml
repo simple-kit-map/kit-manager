@@ -15,3 +15,6 @@ commands:
     description: This command allows you to create or update a kit
     usage: /setkit <name> <opts>
     aliases: [sk]
+  kits:
+    description: Lists all available kits
+    usage: /kits

@@ -4,6 +4,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import eu.maestro.kitmanager.commands.DisableCommandHandler;
 import eu.maestro.kitmanager.commands.KitCommandHandler;
+import eu.maestro.kitmanager.commands.ListKitsCommandHandler;
 import eu.maestro.kitmanager.commands.SetKitCommandHandler;
 
 public class KitManagerPlugin extends JavaPlugin {
@@ -19,6 +20,7 @@ public class KitManagerPlugin extends JavaPlugin {
 		this.getCommand("disable").setExecutor(new DisableCommandHandler());
 		this.getCommand("setkit").setExecutor(new SetKitCommandHandler());
 		this.getCommand("kit").setExecutor(new KitCommandHandler());
+		this.getCommand("kits").setExecutor(new ListKitsCommandHandler());
 	}
 	
 	@Override
