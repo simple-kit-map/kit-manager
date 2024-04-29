@@ -3,10 +3,6 @@ version: 1.0
 author: Maestro
 main: eu.maestro.kitmanager.KitManagerPlugin
 commands:
-  disable:
-    description: This command allows you to disable the plugin itself
-    usage: /disable
-    aliases: [d]
   kit:
     description: This command allows you to set a kit to a player
     usage: /kit <name> <player>
@@ -18,3 +14,4 @@ commands:
   kits:
     description: Lists all available kits
     usage: /kits
+    aliases: [ks]

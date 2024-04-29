@@ -5,6 +5,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import eu.maestro.kitmanager.KitManagerPlugin;
 import eu.maestro.kitmanager.utils.KitUtils;
 import net.md_5.bungee.api.ChatColor;
 
@@ -23,13 +24,15 @@ public class SetKitCommandHandler implements CommandExecutor {
 		
 		final String kitName = args[0];
 		final Player player  = (Player)sender;
+		final String kit     = KitUtils.serializeKit(player);
 		
-		final boolean success = KitUtils.saveKit(kitName, player, args);
-		
-		if(success)
+		if(!kit.equals("")) {
+			KitManagerPlugin.getInstance().addKit(kitName, kit);
 			player.sendMessage(ChatColor.GREEN + "successfully created kit: " + kitName);
-		else
+		}
+		else {
 			player.sendMessage(ChatColor.RED + "failed to create kit: " + kitName);
+		}
 		
 		return true;
 	}
