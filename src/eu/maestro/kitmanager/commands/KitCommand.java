@@ -25,15 +25,31 @@ public class KitCommand extends Command {
 	public KitCommand(final KitManager plugin, String name) {
 		super(name);
 		this.plugin = plugin;
-		this.setAliases(Arrays.asList("kit", "k", "ks", "ladder"));
-		this.setUsage(ChatColor.RED + "/" + name + " <kit> / create <kit> / rename <kit> / delete <kit> / list");
+		this.setAliases(Arrays.asList("kit", "kits", "k", "ks", "ladder"));
+		this.setUsage(ChatColor.RED + "usage: /" + name + " <kit> / create <kit> / rename <kit> / delete <kit> / list");
 		this.name = name;
 	}
 
 	@Override
 	public boolean execute(CommandSender sender, String label, String[] args) {
-		if (args.length == 0) {
+		
+		
+		final Set<String> kits = this.plugin.getManagerHandler().getFileManager().getKits().keySet();
+		
+		
+		if (args.length == 0 || (args.length == 1 && args[0].equalsIgnoreCase("list"))) {
+			
 			sender.sendMessage(this.usageMessage);
+			
+			if (kits.isEmpty()) {
+				sender.sendMessage("There are no kits to list (empty)");
+			}
+			sender.sendMessage(ChatColor.GRAY + "There are " + kits.size() + " kits available:");
+			sender.sendMessage("");
+			for (String name : kits) {
+				sender.sendMessage(name);
+			}
+			sender.sendMessage("");	
 			return false;
 		}
 		if (args[0].equalsIgnoreCase("create")) {
@@ -75,25 +91,10 @@ public class KitCommand extends Command {
 			sender.sendMessage(ChatColor.GREEN + "Succesfully created the kit " + args[1]);
 			return false;
 		}
-		if (args.length == 1 && args[0].equalsIgnoreCase("list")) {
-			
-			final Set<String> kits = this.plugin.getManagerHandler().getFileManager().getKits().keySet();
-			if (kits.isEmpty()) {
-				sender.sendMessage("There are no kits to list (empty)");
-			}
-			sender.sendMessage(ChatColor.GRAY + "There are " + kits.size() + " kits available:");
-			sender.sendMessage("");
-			for (String name : kits) {
-				sender.sendMessage(name);
-			}
-			sender.sendMessage("");
-			return false;
-		}
 		if (args.length == 2 && args[0].equalsIgnoreCase("delete")) {
 			
-			final Map<String, Kit> kits = this.plugin.getManagerHandler().getFileManager().getKits();
-
-			if (!kits.keySet().contains(args[1])){
+	
+			if (!kits.contains(args[1])){
 				sender.sendMessage(ChatColor.RED + "kit `" + args[1] + "` doesn't exist!");
 				return false;
 			}
