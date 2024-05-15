@@ -1,6 +1,8 @@
 package eu.maestro.kitmanager.commands;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -10,6 +12,8 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+
 import eu.maestro.kitmanager.KitManager;
 import eu.maestro.kitmanager.cache.Kit;
 
@@ -46,6 +50,7 @@ public class KitCommand extends Command {
 				if (Bukkit.getPlayer(sender.getName()).getInventory().getContents()[i] != null) {
 				    if (!Bukkit.getPlayer(sender.getName()).getInventory().getContents()[i].getType().equals(Material.AIR)) {
 				        emptyInventory = false;
+				        break;
 				    }	
 				}
 			}
@@ -53,15 +58,50 @@ public class KitCommand extends Command {
 			    sender.sendMessage(ChatColor.RED + "Sorry but you don't have any items in your inventory!");
 			    return false;
 			}
-			if (this.plugin.getManagerHandler().getFileManager().getKits().containsKey(args[1])) {
+			if (!sender.hasPermission("kitmanager.overwritekit") && this.plugin.getManagerHandler().getFileManager().getKits().containsKey(args[1])) {
 				sender.sendMessage(ChatColor.RED + "Sorry but " + args[0] + " kit already exist please choose another name!");
 				return false;
 			}
-			this.plugin.getManagerHandler().getFileManager().getKits().put(args[1], new Kit(Bukkit.getPlayer(sender.getName()).getUniqueId(), args[1], Bukkit.getPlayer(sender.getName()).getInventory().getContents(), Bukkit.getPlayer(sender.getName()).getInventory().getArmorContents(), Bukkit.getPlayer(sender.getName()).getActivePotionEffects().stream().collect(Collectors.toList())));
+			this.plugin.getManagerHandler().getFileManager().getKits().put(
+					args[1],
+					new Kit(
+						Bukkit.getPlayer(
+						sender.getName()).getUniqueId(),
+						args[1], Bukkit.getPlayer(sender.getName()).getInventory().getContents(),
+						Bukkit.getPlayer(sender.getName()).getInventory().getArmorContents(),
+						Bukkit.getPlayer(sender.getName()).getActivePotionEffects().stream().collect(Collectors.toList())
+						)
+			);
 			sender.sendMessage(ChatColor.GREEN + "Succesfully created the kit " + args[1]);
 			return false;
 		}
-		if (args.length == 1 && !args[0].equalsIgnoreCase("list")) {
+		if (args.length == 1 && args[0].equalsIgnoreCase("list")) {
+			
+			final Set<String> kits = this.plugin.getManagerHandler().getFileManager().getKits().keySet();
+			if (kits.isEmpty()) {
+				sender.sendMessage("There are no kits to list (empty)");
+			}
+			sender.sendMessage(ChatColor.GRAY + "There are " + kits.size() + " kits available:");
+			sender.sendMessage("");
+			for (String name : kits) {
+				sender.sendMessage(name);
+			}
+			sender.sendMessage("");
+			return false;
+		}
+		if (args.length == 2 && args[0].equalsIgnoreCase("delete")) {
+			
+			final Map<String, Kit> kits = this.plugin.getManagerHandler().getFileManager().getKits();
+
+			if (!kits.keySet().contains(args[1])){
+				sender.sendMessage(ChatColor.RED + "kit `" + args[1] + "` doesn't exist!");
+				return false;
+			}
+			this.plugin.getManagerHandler().getFileManager().getKits().remove(args[1]);
+			sender.sendMessage(ChatColor.GREEN + "deleted kit `" + args[1] + "` successfully");
+			return false;
+		}
+		if (args.length == 1) {
 			if (!(sender instanceof Player)) {
 				this.plugin.getConsole().log(Level.SEVERE, ChatColor.RED + "Only usable by a player!");
 				return false;
@@ -72,11 +112,24 @@ public class KitCommand extends Command {
 				return false;
 			}
 			Bukkit.getPlayer(sender.getName()).getInventory().clear();
-			Bukkit.getPlayer(sender.getName()).getInventory().setArmorContents(kit.getArmorContent());
 			Bukkit.getPlayer(sender.getName()).getInventory().setContents(kit.getContent());
-			if (!kit.getPotionEffect().isEmpty()) Bukkit.getPlayer(sender.getName()).addPotionEffects(kit.getPotionEffect());
 			Bukkit.getPlayer(sender.getName()).updateInventory();
-			sender.sendMessage(ChatColor.GREEN + args[0] + " kit as been set!");
+			
+			Bukkit.getPlayer(sender.getName()).getInventory().setArmorContents(kit.getArmorContent());
+
+			
+			for(PotionEffect effect : Bukkit.getPlayer(sender.getName()).getActivePotionEffects())
+			{
+				Bukkit.getPlayer(sender.getName()).removePotionEffect(effect.getType());
+			}
+			
+			if (!kit.getPotionEffect().isEmpty()) Bukkit.getPlayer(sender.getName()).addPotionEffects(kit.getPotionEffect());
+			
+			
+			Bukkit.getPlayer(sender.getName()).setHealth(20);
+			Bukkit.getPlayer(sender.getName()).setSaturation(20.0f);
+			Bukkit.getPlayer(sender.getName()).setFoodLevel(20);
+			sender.sendMessage(ChatColor.GREEN + args[0] + " kit has been set!!");
 			return false;
 		}
 		return false;
