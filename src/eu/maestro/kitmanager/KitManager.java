@@ -11,7 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import eu.maestro.kitmanager.commands.DisableCommand;
 import eu.maestro.kitmanager.commands.KitCommand;
 import eu.maestro.kitmanager.handler.ManagerHandler;
-import net.minecraft.server.v1_8_R3.MinecraftServer;
+import net.minecraft.server.v1_7_R4.MinecraftServer;
 
 public class KitManager extends JavaPlugin {
 
